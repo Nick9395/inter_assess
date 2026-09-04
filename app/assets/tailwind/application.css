@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* 就活面接向け: ネイビー主色、紙色背景、ゴールドのアクセント */
+@theme {
+  --color-navy: #1e3a5f;
+  --color-navy-deep: #152a46;
+  --color-ink: #1a2332;
+  --color-paper: #f7f5f1;
+  --color-muted: #6b7280;
+  --color-gold: #c4a574;
+  --color-gold-dark: #a8894e;
+}

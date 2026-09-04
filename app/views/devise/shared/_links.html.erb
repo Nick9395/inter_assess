@@ -1,0 +1,13 @@
+<div class="mt-8 space-y-2 text-sm">
+  <%- if controller_name != "sessions" %>
+    <p><%= link_to "ログイン", new_session_path(resource_name), class: "text-slate-600 hover:text-slate-900" %></p>
+  <% end %>
+
+  <%- if devise_mapping.registerable? && controller_name != "registrations" %>
+    <p><%= link_to "利用開始", new_registration_path(resource_name), class: "text-slate-600 hover:text-slate-900" %></p>
+  <% end %>
+
+  <%- if devise_mapping.recoverable? && controller_name != "passwords" && controller_name != "registrations" %>
+    <p><%= link_to "パスワードを忘れた場合", new_password_path(resource_name), class: "text-slate-600 hover:text-slate-900" %></p>
+  <% end %>
+</div>
