@@ -28,4 +28,3 @@ module ActionDispatch
     include Devise::Test::IntegrationHelpers
   end
 end
-
