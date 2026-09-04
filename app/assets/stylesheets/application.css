@@ -8,3 +8,36 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* フラッシュの有無でヘッダー位置が動かないよう、上下スロットを固定する */
+:root {
+  --chrome-slot: 21px;
+}
+
+.flash-bar {
+  box-sizing: border-box;
+  height: var(--chrome-slot);
+  overflow: hidden;
+  background-color: #1e3a5f;
+  transition: background-color 300ms ease;
+}
+
+.flash-bar.is-active {
+  background-color: #fff;
+}
+
+.flash-bar [data-flash-target="message"] {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  transition: opacity 300ms ease;
+}
+
+.flash-bar [data-flash-target="message"].is-hidden {
+  opacity: 0;
+}
+
+.site-header-inner {
+  padding-top: 0;
+  padding-bottom: var(--chrome-slot);
+}
