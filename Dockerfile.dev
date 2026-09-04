@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1
+
+# 開発用イメージ。Node.js / Redis は入れない（Importmap + Solid Queue）
+FROM ruby:3.4-bookworm
+
+ENV LANG=C.UTF-8 \
+    RUBY_YJIT_ENABLE=1 \
+    BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3 \
+    RAILS_ENV=development
+
+# pg / psych / Active Storage(vips) / tailwindcss-rails のバイナリ取得用
+RUN apt-get update -qq \
+  && apt-get install --no-install-recommends -y \
+    build-essential \
+    libpq-dev \
+    postgresql-client \
+    libvips \
+    git \
+    curl \
+    libyaml-dev \
+    pkg-config \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
+
+WORKDIR /app
+
+# Gemfile があるときだけ bundle install し、古い PID を消してからコマンドを実行する
+COPY --chmod=755 <<'EOF' /usr/local/bin/docker-entrypoint
+#!/bin/bash
+set -e
+if [ -f Gemfile ]; then
+  bundle check >/dev/null 2>&1 || bundle install
+fi
+mkdir -p tmp/pids
+rm -f tmp/pids/server.pid
+exec "$@"
+EOF
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+
+EXPOSE 3000
+
+CMD ["bash"]

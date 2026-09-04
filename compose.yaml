@@ -1,0 +1,94 @@
+# 開発環境: web(Puma) / worker(Solid Queue) / db(PostgreSQL)
+# Redis は使わない。秘密情報は .env から読み込む。
+
+services:
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-inter_assess}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-inter_assess_development}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-inter_assess} -d ${POSTGRES_DB:-inter_assess_development}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "true"
+      POSTGRES_USER: ${POSTGRES_USER:-inter_assess}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-inter_assess_development}
+      DATABASE_URL: ${DATABASE_URL:-postgres://inter_assess:password@db:5432/inter_assess_development}
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    # Rails 未導入のときは待機し、導入後は Puma を起動する
+    command:
+      - bash
+      - -c
+      - |
+        if [ -x bin/rails ]; then
+          exec bin/rails server -b 0.0.0.0 -p 3000
+        else
+          echo "[web] bin/rails がありません。コンテナは待機します。"
+          exec sleep infinity
+        fi
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "true"
+      POSTGRES_USER: ${POSTGRES_USER:-inter_assess}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-inter_assess_development}
+      DATABASE_URL: ${DATABASE_URL:-postgres://inter_assess:password@db:5432/inter_assess_development}
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    # Solid Queue。bin/jobs が無い間は待機する
+    command:
+      - bash
+      - -c
+      - |
+        if [ -x bin/jobs ]; then
+          exec bin/jobs
+        else
+          echo "[worker] bin/jobs がありません。コンテナは待機します。"
+          exec sleep infinity
+        fi
+
+volumes:
+  postgres_data:
+  bundle:
