@@ -2,6 +2,10 @@ ja:
   activerecord:
     models:
       user: ユーザー
+      education_entry: 学歴
+      work_entry: 職歴
+      practice: 模擬面接
+      turn: 質疑
     attributes:
       user:
         username: ユーザー名
@@ -9,3 +13,19 @@ ja:
         password: パスワード
         password_confirmation: パスワード（確認）
         current_password: 現在のパスワード
+      practice:
+        question_count: 質問数
+      turn:
+        answer_text: 回答
+      education_entry:
+        enrolled_on: 入学年月
+        school_name: 学校名
+        faculty: 学部・学科・コース
+        graduated_on: 卒業年月
+        learned: そこで学んだこと
+      work_entry:
+        joined_on: 入社年月
+        left_on: 退社年月
+        company_description: 会社が何をしているか
+        role: 自分の役割
+        achievement: 出した実績

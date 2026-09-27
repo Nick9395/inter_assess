@@ -15,7 +15,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to dashboard_path
     follow_redirect!
-    assert_select "p", text: "nick"
+    assert_select "h1", text: "nick"
     assert_select "[data-flash-target='message']"
   end
 

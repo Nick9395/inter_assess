@@ -9,6 +9,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "ログイン"
     assert_select "a", text: "利用規約"
     assert_select "[data-controller='flash']"
+    assert_select ".sticky.top-0"
     assert_select "dd", text: Rails.env
     assert_select "dd", text: Rails.version
     assert_select "dd", text: RUBY_VERSION

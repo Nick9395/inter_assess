@@ -1,0 +1,47 @@
+<% content_for :title, @practice.completed? ? "面談終了" : "面談" %>
+
+<section class="mx-auto max-w-3xl px-5 py-10">
+  <% if @practice.completed? %>
+    <h1 class="text-xl font-semibold text-ink">面談終了</h1>
+    <p class="mt-2 text-sm text-muted">テキストでの質疑応答はここまでです。音声・深掘り・フィードバックは次の実装です。</p>
+
+    <ol class="mt-8 space-y-6">
+      <% @practice.turns.each_with_index do |turn, index| %>
+        <li class="rounded-lg border border-navy bg-white p-5">
+          <p class="text-xs font-medium text-gold">質問 <%= index + 1 %></p>
+          <p class="mt-2 text-sm text-ink"><%= turn.question_text %></p>
+          <p class="mt-4 text-xs font-medium text-muted">回答</p>
+          <p class="mt-1 whitespace-pre-wrap text-sm text-ink"><%= turn.answer_text %></p>
+        </li>
+      <% end %>
+    </ol>
+
+    <p class="mt-8">
+      <%= link_to "ユーザー画面へ", dashboard_path, class: primary_button_class %>
+    </p>
+  <% else %>
+    <p class="text-xs font-medium tracking-wide text-gold">質問 <%= @practice.answered_count + 1 %> / <%= @practice.question_count %></p>
+    <h1 class="mt-2 text-xl font-semibold text-ink">面談</h1>
+
+    <% if @turn.errors.any? %>
+      <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <ul class="list-disc space-y-1 pl-5">
+          <% @turn.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mt-6 rounded-lg border border-navy bg-white p-5">
+      <p class="text-sm font-semibold text-ink"><%= @turn.question_text %></p>
+    </div>
+
+    <%= form_with model: @turn, url: practice_answers_path(@practice), method: :post, class: "mt-6 space-y-4", data: { controller: "answer-form", action: "keydown->answer-form#submitOnEnter" } do |f| %>
+      <%= f.label :answer_text, "回答", class: auth_label_class %>
+      <%= f.text_area :answer_text, rows: 6, class: auth_field_class, autofocus: true %>
+      <p class="text-xs text-muted">Enter で送信、Shift+Enter で改行。音声入力は次の実装です。</p>
+      <%= f.submit "送信する", class: primary_button_class %>
+    <% end %>
+  <% end %>
+</section>

@@ -10,7 +10,9 @@ class DashboardsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:one)
     get dashboard_path
     assert_response :success
-    assert_select "p", text: users(:one).username
+    assert_select "h1", text: users(:one).username
+    assert_select "a", text: "プロフィールを編集"
+    assert_select "a", text: "プロフィールを登録"
     assert_select "button[title='ログアウト']"
   end
 end
