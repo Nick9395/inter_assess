@@ -1,0 +1,138 @@
+<% content_for :title, "プロフィール" %>
+
+<section class="mx-auto max-w-3xl px-5 py-10 pb-36">
+  <h1 class="text-xl font-semibold text-ink">プロフィール</h1>
+  <p class="mt-2 text-sm text-muted">氏名・住所・連絡先は入力しないでください。学歴は最大2件、職歴は最大3社です。</p>
+
+  <% if current_user.errors.any? %>
+    <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <ul class="list-disc space-y-1 pl-5">
+        <% current_user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: current_user, url: profile_path, method: :patch, id: "profile-form", class: "mt-8 space-y-10" do |f| %>
+    <div data-controller="slot-list">
+      <h2 class="text-sm font-semibold tracking-wide text-navy">学歴（最大2件）</h2>
+      <div class="mt-4 space-y-6">
+        <% f.object.education_entries.each_with_index do |entry, index| %>
+          <%= f.fields_for :education_entries, entry do |ef| %>
+            <fieldset class="rounded-lg border border-navy bg-white p-5" data-slot-list-target="slot" <%= "hidden" unless profile_slot_visible?(entry, index) %>>
+              <legend class="px-1 text-xs font-medium text-gold"><%= index + 1 %> 件目</legend>
+              <%= ef.hidden_field :id %>
+              <%= ef.hidden_field :position %>
+
+              <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <%= ef.label :enrolled_on, class: auth_label_class %>
+                  <%= ef.month_field :enrolled_on, value: month_field_value(ef.object.enrolled_on), class: auth_field_class %>
+                </div>
+                <div>
+                  <%= ef.label :graduated_on, class: auth_label_class %>
+                  <%= ef.month_field :graduated_on, value: month_field_value(ef.object.graduated_on), class: auth_field_class %>
+                  <p class="mt-1 text-xs text-muted">在学中は空欄</p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <%= ef.label :school_name, class: auth_label_class %>
+                <%= ef.text_field :school_name, class: auth_field_class %>
+              </div>
+
+              <div class="mt-4">
+                <%= ef.label :faculty, class: auth_label_class %>
+                <%= ef.text_field :faculty, class: auth_field_class %>
+              </div>
+
+              <div class="mt-4">
+                <%= ef.label :learned, class: auth_label_class %>
+                <%= ef.text_area :learned, rows: 3, class: auth_field_class %>
+              </div>
+
+              <% if ef.object.persisted? %>
+                <label class="mt-4 flex items-center gap-2 text-sm text-muted">
+                  <%= ef.check_box :_destroy %>
+                  この学歴を削除する
+                </label>
+              <% end %>
+            </fieldset>
+          <% end %>
+        <% end %>
+      </div>
+      <button type="button" class="<%= secondary_button_class %> mt-4" data-slot-list-target="addButton" data-action="slot-list#add">+ 学歴追加</button>
+    </div>
+
+    <div data-controller="slot-list">
+      <h2 class="text-sm font-semibold tracking-wide text-navy">職歴（最大3社）</h2>
+      <div class="mt-4 space-y-6">
+        <% f.object.work_entries.each_with_index do |entry, index| %>
+          <%= f.fields_for :work_entries, entry do |wf| %>
+            <fieldset class="rounded-lg border border-navy bg-white p-5" data-slot-list-target="slot" <%= "hidden" unless profile_slot_visible?(entry, index) %>>
+              <legend class="px-1 text-xs font-medium text-gold"><%= index + 1 %> 社目</legend>
+              <%= wf.hidden_field :id %>
+              <%= wf.hidden_field :position %>
+
+              <div class="mt-3 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <%= wf.label :joined_on, class: auth_label_class %>
+                  <%= wf.month_field :joined_on, value: month_field_value(wf.object.joined_on), class: auth_field_class %>
+                </div>
+                <div>
+                  <%= wf.label :left_on, class: auth_label_class %>
+                  <%= wf.month_field :left_on, value: month_field_value(wf.object.left_on), class: auth_field_class %>
+                  <p class="mt-1 text-xs text-muted">在職中は空欄</p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <%= wf.label :company_description, class: auth_label_class %>
+                <%= wf.text_area :company_description, rows: 2, class: auth_field_class %>
+              </div>
+
+              <div class="mt-4">
+                <%= wf.label :role, class: auth_label_class %>
+                <%= wf.text_field :role, class: auth_field_class %>
+              </div>
+
+              <div class="mt-4">
+                <%= wf.label :achievement, class: auth_label_class %>
+                <%= wf.text_area :achievement, rows: 3, class: auth_field_class %>
+              </div>
+
+              <% if wf.object.persisted? %>
+                <label class="mt-4 flex items-center gap-2 text-sm text-muted">
+                  <%= wf.check_box :_destroy %>
+                  この職歴を削除する
+                </label>
+              <% end %>
+            </fieldset>
+          <% end %>
+        <% end %>
+      </div>
+      <button type="button" class="<%= secondary_button_class %> mt-4" data-slot-list-target="addButton" data-action="slot-list#add">+ 職歴追加</button>
+    </div>
+  <% end %>
+
+  <% if current_user.profile_present? %>
+    <%= form_with url: profile_path, method: :delete, id: "profile-delete-form", class: "hidden" do %>
+    <% end %>
+  <% end %>
+</section>
+
+<div class="fixed inset-x-0 bottom-0 z-20 border-t border-gold bg-paper">
+  <div class="mx-auto flex max-w-3xl flex-col gap-3 px-5 py-3">
+    <% if current_user.profile_present? %>
+      <p class="text-xs text-muted">学歴と職歴だけを消します。アカウントや面談記録は消えません。</p>
+    <% end %>
+    <div class="flex flex-wrap gap-3">
+      <%= button_tag "保存する", type: :submit, form: "profile-form", class: primary_button_class %>
+      <%= link_to "ユーザー画面へ", dashboard_path, class: secondary_button_class %>
+      <% if current_user.profile_present? %>
+        <%= button_tag "プロフィールを削除", type: :submit, form: "profile-delete-form", class: danger_button_class, data: { turbo_confirm: "プロフィール（学歴・職歴）を削除します。よろしいですか？" } %>
+      <% end %>
+    </div>
+  </div>
+</div>

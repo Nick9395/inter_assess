@@ -1,0 +1,28 @@
+<% content_for :title, "面談を始める" %>
+
+<section class="mx-auto max-w-3xl px-5 py-10">
+  <h1 class="text-xl font-semibold text-ink">面談を始める</h1>
+  <p class="mt-2 text-sm text-muted">よくある質問を型に、登録済みの経歴を踏まえた本問を用意します。今回はテキストのみです。</p>
+
+  <% if @practice.errors.any? %>
+    <div class="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <ul class="list-disc space-y-1 pl-5">
+        <% @practice.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @practice, url: practices_path, class: "mt-8 space-y-6" do |f| %>
+    <div>
+      <%= f.label :question_count, "質問数", class: auth_label_class %>
+      <%= f.select :question_count, Practice::QUESTION_COUNT_RANGE.to_a, {}, class: auth_field_class %>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <%= f.submit "開始する", class: primary_button_class %>
+      <%= link_to "ユーザー画面へ", dashboard_path, class: "inline-flex items-center rounded-md border border-navy px-4 py-2 text-sm text-navy hover:bg-white" %>
+    </div>
+  <% end %>
+</section>

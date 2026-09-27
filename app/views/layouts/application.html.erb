@@ -24,36 +24,40 @@
   </head>
 
   <body class="min-h-screen bg-paper text-ink antialiased">
-    <div data-controller="flash" data-flash-delay-value="6000">
-      <div class="flash-bar<%= ' is-active' if notice.present? || alert.present? %>" data-flash-target="bar">
-        <div class="mx-auto flex h-full max-w-3xl items-center px-5">
-          <% if alert.present? %>
-            <p class="truncate text-red-800" data-flash-target="message" data-turbo-temporary role="alert"><%= alert %></p>
-          <% elsif notice.present? %>
-            <p class="truncate text-navy" data-flash-target="message" data-turbo-temporary role="status"><%= notice %></p>
-          <% end %>
+    <div class="sticky top-0 z-30 bg-navy">
+      <div data-controller="flash" data-flash-delay-value="6000">
+        <div class="flash-bar<%= ' is-active' if notice.present? || alert.present? %>" data-flash-target="bar">
+          <div class="mx-auto flex h-full max-w-3xl items-center px-5">
+            <% if alert.present? %>
+              <p class="truncate text-red-800" data-flash-target="message" data-turbo-temporary role="alert"><%= alert %></p>
+            <% elsif notice.present? %>
+              <p class="truncate text-navy" data-flash-target="message" data-turbo-temporary role="status"><%= notice %></p>
+            <% end %>
+          </div>
         </div>
       </div>
-    </div>
 
-    <header class="border-b border-gold bg-navy">
-      <div class="site-header-inner mx-auto flex max-w-3xl items-center justify-between gap-4 px-5">
-        <%= link_to "Inter_Assess", user_signed_in? ? dashboard_path : root_path, class: "text-sm font-semibold tracking-tight text-paper" %>
-        <nav class="flex items-center gap-4">
-          <% if user_signed_in? %>
-            <%= button_to destroy_user_session_path, method: :delete, class: "rounded-md p-1 text-paper/80 hover:bg-white/10 hover:text-gold", form_class: "inline-flex", aria: { label: "ログアウト" }, title: "ログアウト" do %>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-              </svg>
+      <header class="border-b border-gold bg-navy">
+        <div class="site-header-inner mx-auto flex max-w-3xl items-center justify-between gap-4 px-5">
+          <%= link_to "Inter_Assess", user_signed_in? ? dashboard_path : root_path, class: "text-sm font-semibold tracking-tight text-paper" %>
+          <nav class="flex items-center gap-4">
+            <% if user_signed_in? %>
+              <%= link_to "面談", current_user.in_progress_practice || new_practice_path, class: nav_link_class %>
+              <%= link_to "プロフィール", edit_profile_path, class: nav_link_class %>
+              <%= button_to destroy_user_session_path, method: :delete, class: "rounded-md p-1 text-paper/80 hover:bg-white/10 hover:text-gold", form_class: "inline-flex", aria: { label: "ログアウト" }, title: "ログアウト" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                </svg>
+              <% end %>
+            <% else %>
+              <%= link_to "利用開始", new_user_registration_path, class: nav_link_class %>
+              <%= link_to "ログイン", new_user_session_path, class: nav_link_class %>
+              <%= link_to "利用規約", terms_path, class: nav_link_class %>
             <% end %>
-          <% else %>
-            <%= link_to "利用開始", new_user_registration_path, class: nav_link_class %>
-            <%= link_to "ログイン", new_user_session_path, class: nav_link_class %>
-            <%= link_to "利用規約", terms_path, class: nav_link_class %>
-          <% end %>
-        </nav>
-      </div>
-    </header>
+          </nav>
+        </div>
+      </header>
+    </div>
 
     <main>
       <%= yield %>

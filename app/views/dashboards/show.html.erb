@@ -1,5 +1,43 @@
 <% content_for :title, "ユーザー画面" %>
 
-<section class="mx-auto max-w-3xl px-5 py-16">
-  <p class="text-sm text-slate-500"><%= current_user.username %></p>
+<section class="mx-auto max-w-3xl px-5 py-12">
+  <h1 class="text-xl font-semibold text-ink"><%= current_user.username %></h1>
+  <p class="mt-2 text-sm text-muted">面談の前に、学歴と職歴を登録してください。何度でも使い回せます。</p>
+
+  <div class="mt-8 space-y-4">
+    <div class="rounded-lg border border-navy bg-white p-5">
+      <p class="text-sm font-semibold text-ink">模擬面接</p>
+      <% if (ongoing = current_user.in_progress_practice) %>
+        <p class="mt-3 text-sm text-muted">進行中の面談があります。質問 <%= ongoing.answered_count + 1 %> / <%= ongoing.question_count %></p>
+        <p class="mt-4">
+          <%= link_to "面談を続ける", ongoing, class: primary_button_class %>
+        </p>
+      <% elsif current_user.profile_present? %>
+        <p class="mt-3 text-sm text-muted">質問数を 5〜10 から選んで開始できます。</p>
+        <p class="mt-4">
+          <%= link_to "面談を始める", new_practice_path, class: primary_button_class %>
+        </p>
+      <% else %>
+        <p class="mt-3 text-sm text-muted">学歴または職歴を登録すると開始できます。</p>
+        <p class="mt-4">
+          <%= link_to "プロフィールを登録", edit_profile_path, class: primary_button_class %>
+        </p>
+      <% end %>
+    </div>
+
+    <div class="rounded-lg border border-navy bg-white p-5">
+      <p class="text-sm font-semibold text-ink">プロフィール</p>
+      <% if current_user.profile_present? %>
+        <ul class="mt-3 space-y-1 text-sm text-muted">
+          <li>学歴 <%= current_user.education_entries.size %> 件</li>
+          <li>職歴 <%= current_user.work_entries.size %> 社</li>
+        </ul>
+      <% else %>
+        <p class="mt-3 text-sm text-muted">まだ登録がありません。</p>
+      <% end %>
+      <p class="mt-4">
+        <%= link_to "プロフィールを編集", edit_profile_path, class: "inline-flex items-center rounded-md border border-navy px-4 py-2 text-sm text-navy hover:bg-white" %>
+      </p>
+    </div>
+  </div>
 </section>
